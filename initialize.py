@@ -7,10 +7,6 @@
 # 追加インポート（ファイル冒頭の import 群に）
 import os
 os.makedirs(".chroma", exist_ok=True)
-os.environ.setdefault("CHROMA_DB_IMPL", "duckdb+parquet")   # sqlite回避（保険）
-os.environ.setdefault("CHROMA_TELEMETRY", "false")
-os.environ.setdefault("CHROMA_PERSIST_DIRECTORY", ".chroma")
-
 import logging
 import streamlit as st
 from dotenv import load_dotenv
