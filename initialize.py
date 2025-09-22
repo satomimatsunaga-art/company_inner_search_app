@@ -8,6 +8,13 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
+import sys, pysqlite3
+sys.modules["sqlite3"] = pysqlite3
+sys.modules["pysqlite3"] = pysqlite3
+os.environ.setdefault("CHROMA_DB_IMPL", "duckdb+parquet")  # ← 重要
+os.environ.setdefault("CHROMA_TELEMETRY", "false")
+os.makedirs(".chroma", exist_ok=True)
+os.environ.setdefault("CHROMA_PERSIST_DIRECTORY", ".chroma")
 
 # .env をローカル開発用に読み込む（クラウドでは基本無視される）
 load_dotenv()
