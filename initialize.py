@@ -1,6 +1,26 @@
 """
 このファイルは、最初の画面読み込み時にのみ実行される初期化処理が記述されたファイルです。
 """
+#############################################
+# 私が追加したやつ（ライブラリの読み込みより上
+#############################################
+# 追加インポート（ファイル冒頭の import 群に）
+import os
+import streamlit as st
+from dotenv import load_dotenv
+
+# .env をローカル開発用に読み込む（クラウドでは基本無視される）
+load_dotenv()
+
+# OPENAI_API_KEY を secrets > env の順で取得
+OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+
+if not OPENAI_API_KEY:
+    st.error("OPENAI_API_KEY が設定されていません。Streamlit の Secrets に追加するか、.env に設定してください。")
+    st.stop()
+
+
+
 
 ############################################################
 # ライブラリの読み込み
