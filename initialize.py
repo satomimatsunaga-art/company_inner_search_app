@@ -166,6 +166,8 @@ def initialize_retriever():
         anonymized_telemetry=False,
     )
 
+    logging.getLogger(ct.LOGGER_NAME).info("Using Chroma with duckdb+parquet at ./.chroma")
+    
     db = Chroma.from_documents(
         splitted_docs,
         embedding=embeddings,
