@@ -6,6 +6,22 @@
 #############################################
 # 追加インポート（ファイル冒頭の import 群に）
 import os
+
+for k in [
+    "CHROMA_DB_IMPL",
+    "CHROMA_PERSIST_DIRECTORY",
+    "CHROMA_TELEMETRY",
+    "IS_PERSISTENT",
+    "ANONYMIZED_TELEMETRY",
+    "ALLOW_RESET",
+    "CHROMA_SERVER_AUTH_PROVIDER",
+    "CHROMA_SERVER_HOST",
+    "CHROMA_SERVER_HTTP_PORT",
+    "CHROMA_SERVER_SSL_ENABLED",
+]:
+    os.environ.pop(k, None)
+
+    
 os.makedirs(".chroma", exist_ok=True)
 import logging
 import streamlit as st
