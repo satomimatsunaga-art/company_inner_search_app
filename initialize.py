@@ -150,29 +150,9 @@ def initialize_retriever():
 
     # チャンク分割を実施
     splitted_docs = text_splitter.split_documents(docs_all)
-
-#################################################
-# 私が追加したやつ（#ベクターストアの作成より上）
-# コメントにした下の2分は復帰させる
-#############################################
-import os
-from chromadb.config import Settings
-os.makedirs(".chroma", exist_ok=True)  # 永続先を用意
-client_settings = Settings(
-    chroma_db_impl="duckdb+parquet",
-    persist_directory=".chroma",
-    anonymized_telemetry=False,
-)
-
-db = Chroma.from_documents(
-    splitted_docs,
-    embedding=embeddings,
-    client_settings=client_settings,
-)
-
-
- #   # ベクターストアの作成
- #   db = Chroma.from_documents(splitted_docs, embedding=embeddings)
+    
+    # ベクターストアの作成
+    db = Chroma.from_documents(splitted_docs, embedding=embeddings)
 
     # ベクターストアを検索するRetrieverの作成
     st.session_state.retriever = db.as_retriever(search_kwargs={"k": 5})
