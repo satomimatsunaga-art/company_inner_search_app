@@ -6,15 +6,20 @@
 #############################################
 # 追加インポート（ファイル冒頭の import 群に）
 import os
+os.makedirs(".chroma", exist_ok=True)
+os.environ.setdefault("CHROMA_DB_IMPL", "duckdb+parquet")   # sqlite回避（保険）
+os.environ.setdefault("CHROMA_TELEMETRY", "false")
+os.environ.setdefault("CHROMA_PERSIST_DIRECTORY", ".chroma")
+
+import logging
 import streamlit as st
 from dotenv import load_dotenv
-import sys, pysqlite3
-sys.modules["sqlite3"] = pysqlite3
-sys.modules["pysqlite3"] = pysqlite3
-os.environ.setdefault("CHROMA_DB_IMPL", "duckdb+parquet")  # ← 重要
-os.environ.setdefault("CHROMA_TELEMETRY", "false")
-os.makedirs(".chroma", exist_ok=True)
-os.environ.setdefault("CHROMA_PERSIST_DIRECTORY", ".chroma")
+
+import chromadb
+from chromadb.config import Settings
+
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
 
 # .env をローカル開発用に読み込む（クラウドでは基本無視される）
 load_dotenv()
@@ -162,23 +167,19 @@ def initialize_retriever():
     #私が追加した（ベクターストアの作成より上）
     #ベクターストアの作成の箇所1行を復帰させる
     ############################################################
-    from chromadb.config import Settings
-    import os
-    # 永続先フォルダを用意（書き込み権限のある相対パス）
-    os.makedirs(".chroma", exist_ok=True)
-
-    client_settings = Settings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory=".chroma",
-        anonymized_telemetry=False,
+    client = chromadb.PersistentClient(
+    path=".chroma",
+    settings=Settings(anonymized_telemetry=False),
     )
+    logging.getLogger(ct.LOGGER_NAME).info("Chroma PersistentClient initialized at ./.chroma (duckdb+parquet)")
 
-    logging.getLogger(ct.LOGGER_NAME).info("Using Chroma with duckdb+parquet at ./.chroma")
-    
+    # ★ その client を LangChain の Chroma に渡す
+    #    既存データが不要＝再生成で良いなら、collection_name は任意の新名に
     db = Chroma.from_documents(
-        splitted_docs,
+        documents=splitted_docs,
         embedding=embeddings,
-        client_settings=client_settings,   # ★ここが重要
+        client=client,
+        collection_name="company_inner_search_docs",
     )
     # ベクターストアの作成
     # db = Chroma.from_documents(splitted_docs, embedding=embeddings)
